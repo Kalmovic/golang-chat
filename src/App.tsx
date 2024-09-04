@@ -70,8 +70,8 @@ export default function Component() {
     }
   }, [isNameDialogOpen, userName]);
 
-  const storedName = localStorage.getItem("chatUserName");
   useEffect(() => {
+    const storedName = localStorage.getItem("chatUserName");
     if (storedName) {
       setUserName(storedName);
       setIsNameDialogOpen(false);
@@ -127,7 +127,9 @@ export default function Component() {
               key={message.id}
               className="text-center text-xs text-gray-400 rounded-full bg-gray-200 py-1 mb-4"
             >
-              {message.user === storedName
+              {message.text.includes(
+                localStorage.getItem("chatUserName") as string
+              ) || index === 0
                 ? "You just entered the chat"
                 : message.text}
             </div>

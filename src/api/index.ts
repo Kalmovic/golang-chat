@@ -1,16 +1,13 @@
-let socket = new WebSocket("ws://localhost:8080/ws");
+let username = localStorage.getItem("chatUserName") || "Anonymous";
+let socket = new WebSocket(
+  `ws://localhost:8080/ws?username=${encodeURIComponent(username)}`
+);
 
 let connect = (cb: Function) => {
   console.log("Attempting Connection...");
 
   socket.onopen = () => {
     console.log("Successfully Connected");
-    cb({
-      data: JSON.stringify({
-        user: "System",
-        body: "You just entered the chat room",
-      }),
-    });
   };
 
   socket.onmessage = (msg) => {
