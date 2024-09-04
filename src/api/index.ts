@@ -5,10 +5,17 @@ let connect = (cb: Function) => {
 
   socket.onopen = () => {
     console.log("Successfully Connected");
+    cb({
+      data: JSON.stringify({
+        user: "System",
+        body: "You just entered the chat room",
+      }),
+    });
   };
 
   socket.onmessage = (msg) => {
     console.log("Message from websocket:", msg);
+    cb(msg);
   };
 
   socket.onclose = (event) => {
@@ -20,9 +27,9 @@ let connect = (cb: Function) => {
   };
 };
 
-let sendMsg = (msg: string) => {
+let sendMsg = (msg: { user: string; body: string }) => {
   console.log("sending msg: ", msg);
-  socket.send(msg);
+  socket.send(JSON.stringify(msg));
 };
 
 export { connect, sendMsg };

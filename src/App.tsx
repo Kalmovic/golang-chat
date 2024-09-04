@@ -51,11 +51,13 @@ export default function Component() {
 
   useEffect(() => {
     connect((msg: MessageEvent) => {
+      console.log("Message from websocket:", msg);
       const messageData = JSON.parse(msg.data);
+      console.log("Message data:", messageData);
       const newMessage: Message = {
         id: Date.now(),
         user: messageData.user || "Anonymous",
-        text: messageData.text,
+        text: messageData.body,
         isSent: false,
       };
       setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -68,8 +70,8 @@ export default function Component() {
     }
   }, [isNameDialogOpen, userName]);
 
+  const storedName = localStorage.getItem("chatUserName");
   useEffect(() => {
-    const storedName = localStorage.getItem("chatUserName");
     if (storedName) {
       setUserName(storedName);
       setIsNameDialogOpen(false);
@@ -89,16 +91,11 @@ export default function Component() {
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
     if (inputMessage.trim() !== "") {
-      sendMsg(
-        JSON.stringify({
-          user: userName || randomName,
-          text: inputMessage.trim(),
-        })
-      );
+      sendMsg({ user: userName, body: inputMessage });
       const newMessage: Message = {
         id: Date.now(),
         user: userName || randomName,
-        text: inputMessage.trim(),
+        text: inputMessage,
         isSent: true,
       };
       setMessages((prevMessages) => [...prevMessages, newMessage]);
@@ -125,7 +122,16 @@ export default function Component() {
         {messages.map((message, index) => {
           const showUser =
             index === 0 || messages[index - 1].user !== message.user;
-          return (
+          return message.user === "System" ? (
+            <div
+              key={message.id}
+              className="text-center text-xs text-gray-400 rounded-full bg-gray-200 py-1 mb-4"
+            >
+              {message.user === storedName
+                ? "You just entered the chat"
+                : message.text}
+            </div>
+          ) : (
             <div
               key={message.id}
               className={`mb-2 ${message.isSent ? "text-right" : "text-left"}`}
